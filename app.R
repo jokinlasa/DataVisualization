@@ -4,6 +4,10 @@ library(leaflet)
 library(readr)
 library(dplyr)
 library(ggplot2)
+library(shinydashboard)
+library(ggvis)
+
+
 source('ui.R', local = TRUE)
 source('server.R')
 source('data.r')
