@@ -8,6 +8,7 @@ library(shinydashboard)
 library(ggvis)
 install.packages("hpackedbubble", build_vignettes = TRUE)
 library(hpackedbubble)
+library(reshape2)
 
 
 source('ui.R', local = TRUE)

@@ -58,18 +58,18 @@ server <- function(input, output) {
   )
   vis %>% bind_shiny("plot2")
   
-  output$bubbleplot <- renderHpackedbubble({ hpackedbubble(order_company_values$company_location[1:20],Chocolate$manufacturer[1:20], order_company_values$count[1:20],
+  output$bubbleplot <- renderHpackedbubble({ hpackedbubble(company_manufacturers_info2$company_location,company_manufacturers_info2$manufacturer, order_company_values$count,
                                                            title = "TOP 20 COUNTRIES WITH MORE CHOCOLATE MANUFACTURERS",
-                                                           pointFormat = "<b>{{point.manufacturer}}</b>",
-                                                           dataLabelsFilter = 100,
-                                                           packedbubbleMinSize = "1%",
+                                                           pointFormat = "<b>{point.name}</b> {point.y}",
+                                                           dataLabelsFilter = 1000,
+                                                           packedbubbleMinSize = "20%",
                                                            packedbubbleMaxSize = "250%",
                                                            theme = "sunset",
                                                            packedbubbleZMin = 0,
                                                            packedbubbleZmax = 1000, split = 1,
                                                            gravitational = 0.02,
-                                                           parentNodeLimit = 100,
+                                                           parentNodeLimit = 50,
                                                            dragBetweenSeries = 0,
                                                            seriesInteraction = 0,
-                                                           width = "100%")}) 
+                                                           width = "200%")}) 
 }

@@ -45,7 +45,7 @@ ui <- dashboardPage(
                             choices=  list("manufacturers"=1, "bean origins"=2),
                             selected=1
                 ),
-                hpackedbubbleOutput("bubbleplot", width = "100%", height = "600px")
+                hpackedbubbleOutput("bubbleplot", width = "100%", height = "1500px")
               ))
    
     )
