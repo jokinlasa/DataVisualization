@@ -13,3 +13,10 @@ cocoa_tooltip <- function(x) {
          bar$bean_origin
   )
 }
+
+company_countries <- unique(Chocolate$company_location)
+
+company_values <- Chocolate %>% group_by(company_location) %>% summarise(count=n_distinct(manufacturer))
+order_company_values <- company_values %>%
+                        as.data.frame() %>%
+                        arrange(desc(count))

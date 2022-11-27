@@ -29,16 +29,24 @@ ui <- dashboardPage(
                  box(title = "Barplot", width=9, status="primary",plotOutput(outputId = "plot1"))
             ),
              fluidRow(
-                box(
-                  
-                  ggvisOutput("plot2")
-                )
+               
+                      box( width = 16,   
+                           ggvisOutput("plot2")
+                      )
+     
              )
       ),
   
       #second tab content
       tabItem(tabName="widgets",
-              h2("second tab"))
+              h2("second tab"),
+              fluidRow(
+                selectInput("CircleGraph", "Choose what you want to visualize:",
+                            choices=  list("manufacturers"=1, "bean origins"=2),
+                            selected=1
+                ),
+                hpackedbubbleOutput("bubbleplot", width = "100%", height = "600px")
+              ))
    
     )
   )
