@@ -1,5 +1,6 @@
 library(shinydashboard)
 library(ggvis)
+library(hpackedbubble)
 source('data.r')
  
 ui <- dashboardPage(
@@ -8,6 +9,7 @@ ui <- dashboardPage(
   dashboardSidebar(
     sidebarMenu(
       menuItem("Dashboard", tabName = "dashboard", icon = icon("dashboard")),
+      menuItem("Widgets", tabName = "widgets", icon = icon("th")),
       menuItem("Maps", tabName = "maps", icon = icon("earth-americas"))
     )
   ),
@@ -33,6 +35,7 @@ ui <- dashboardPage(
                 box(width=12,
                   ggvisOutput("plot2")
                 )
+
              )
       ),
   
@@ -47,8 +50,17 @@ ui <- dashboardPage(
               fluidRow(
                 box(title = "Average number of ingredients used by country", width=12, status="primary",plotOutput(outputId = "mapPlot1", width="100%"))
               )
-              )
-   
+              ),
+      
+      tabItem(tabName="widgets",
+              h2("widgets tab"),
+              fluidRow(
+                selectInput("CircleGraph", "Choose what you want to visualize:",
+                            choices=  list("manufacturers"=1, "bean origins"=2),
+                            selected=1
+                ),
+                hpackedbubbleOutput("bubbleplot", width = "100%", height = "800px")
+              ))
     )
   )
 )
