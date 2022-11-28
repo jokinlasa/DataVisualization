@@ -1,3 +1,16 @@
+library(readr)
+library(shiny)
+library(rgdal)
+library(leaflet)
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(shinydashboard)
+library(ggvis)
+library(hpackedbubble)
+library(reshape2)
+library(DT)
+
 Chocolate <- read_csv("chocolate_bars_2.csv")
 
 # Function for generating tooltip text

@@ -9,6 +9,7 @@ library(ggvis)
 install.packages("hpackedbubble", build_vignettes = TRUE)
 library(hpackedbubble)
 library(reshape2)
+library(DT)
 
 
 source('ui.R', local = TRUE)
