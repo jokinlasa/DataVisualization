@@ -1,4 +1,8 @@
+library(readr)
+
 Chocolate <- read_csv("chocolate_bars_2.csv")
+Chocolate$company_location[Chocolate$company_location == "U.S.A."] <- "United States"
+Chocolate$company_location[Chocolate$company_location == "U.K."] <- "United Kingdom"  
 
 # Function for generating tooltip text
 cocoa_tooltip <- function(x) {

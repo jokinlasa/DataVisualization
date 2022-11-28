@@ -1,4 +1,5 @@
-
+library(shinydashboard)
+library(ggvis)
 source('data.r')
  
 ui <- dashboardPage(
@@ -7,7 +8,7 @@ ui <- dashboardPage(
   dashboardSidebar(
     sidebarMenu(
       menuItem("Dashboard", tabName = "dashboard", icon = icon("dashboard")),
-      menuItem("Widgets", tabName = "widgets", icon = icon("th"))
+      menuItem("Maps", tabName = "maps", icon = icon("earth-americas"))
     )
   ),
   
@@ -23,22 +24,30 @@ ui <- dashboardPage(
                               label = "cocoa percentage:",
                               min = min(Chocolate$cocoa_percent),
                               max = max(Chocolate$cocoa_percent),
-                              value =  c(45, 50)),
+                              value =  c(50, 60)),
            
                 ),
-                 box(title = "Barplot", width=9, status="primary",plotOutput(outputId = "plot1"))
+                 box(title = "Barplot", width=12, status="primary",plotOutput(outputId = "plot1", width="100%"))
             ),
              fluidRow(
-                box(
-                  
+                box(width=12,
                   ggvisOutput("plot2")
                 )
              )
       ),
   
       #second tab content
-      tabItem(tabName="widgets",
-              h2("second tab"))
+      tabItem(tabName="maps",
+                  fluidRow(
+                      box(title = "Cocoa percentage per country", width=12, status="primary",plotOutput(outputId = "mapPlot2", width="100%"))
+                    ),
+                    fluidRow(
+                      box(title = "Ratings per country", width=12, status="primary",plotOutput(outputId = "mapPlot3", width="100%"))
+                      ),
+              fluidRow(
+                box(title = "Average number of ingredients used by country", width=12, status="primary",plotOutput(outputId = "mapPlot1", width="100%"))
+              )
+              )
    
     )
   )
