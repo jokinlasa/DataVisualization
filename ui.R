@@ -13,13 +13,29 @@ ui <- dashboardPage(
       menuItem("Group members", tabName = "group", icon = icon("people-group")),
       menuItem("Animated", tabName = "widgets", icon = icon("chart-area")),
       menuItem("Bar charts", tabName = "barchart", icon = icon("chart-bar")),
-      menuItem("Maps", tabName = "maps", icon = icon("earth-americas"))
+      menuItem("Maps", tabName = "maps", icon = icon("earth-americas")),
+      menuItem("Best chocolate bars", tabName = "bestChocolateBars", icon = icon("percent"))
     )
   ),
   
   dashboardBody(
     tabItems(
       #first tab content
+      tabItem(tabName = "bestChocolateBars",
+              fluidRow( 
+                box(
+                  title = "Choose the range of cocoa percentage that you prefer",width=3,
+                  selectInput("from", 
+                              label = "from",
+                              choices = c("40", "50","60", "70", "80", "90", "100"),
+                              selected = "40"),
+                  selectInput("to", 
+                              label = "to",
+                              choices = c("40", "50","60", "70", "80", "90", "100"),
+                              selected = "60"),
+                ),
+                box(title = "Best chocolate bars in the selected range", width=12, status="primary",plotOutput(outputId = "plot4", width="100%"))
+              )),
       tabItem(tabName = "dashboard",
               # Boxes need to be put in a row (or column)
               fluidRow( 

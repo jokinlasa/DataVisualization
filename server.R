@@ -135,14 +135,29 @@ server <- function(input, output) {
   bean_origin_rating <- Chocolate %>% 
     group_by(bean_origin) %>% 
     summarise(Average_rating = mean(rating))%>%
-    top_n(n = 10, wt = Average_rating) 
+    top_n(n = 10, wt = Average_rating)
   
   output$plot3 <- renderPlot({
-    ggplot(data = bean_origin_rating, aes(y = bean_origin, x = Average_rating, fill = bean_origin)) + 
+    ggplot(data = bean_origin_rating, aes(y = reorder(bean_origin, Average_rating), x = Average_rating, fill = bean_origin)) + 
       geom_col(color = "black") + 
       geom_text(aes(label = round(Average_rating, 2)), hjust = 1.4) +
       theme(legend.position = "none") +
       xlab("Average Rating") +
       ylab("Bean Origin")
   })
+
+  top5_chocolate <- reactive({Chocolate %>% 
+    filter(between (Chocolate$cocoa_percent, input$from, input$to))%>%
+    summarise(rating = rating, bar_name = bar_name, cocoa_percent = cocoa_percent)%>%
+    top_n(n = 10, wt = rating)})
+  
+  output$plot4 <- renderPlot({
+    ggplot(data = subset(head(top5_chocolate(), 5)), aes(x=rating, y=reorder(bar_name,rating) , fill = bar_name)) +
+      geom_col(color = "black") +
+      geom_text(aes(label = rating), hjust = 1.4) +
+      theme(legend.position = "none") +
+      xlab("Rating") +
+      ylab("Chocolate bar name") 
+  })
+
 }
