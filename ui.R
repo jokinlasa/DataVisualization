@@ -1,107 +1,46 @@
+library(readr)
+library(shiny)
+library(rgdal)
+library(leaflet)
+library(dplyr)
+library(ggplot2)
 library(shinydashboard)
 library(ggvis)
+library(maps)
+library(reshape2)
 library(hpackedbubble)
-source('data.r')
+library(DT)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(sf)
+library(ggiraph)
+library(gganimate)
  
 ui <- dashboardPage(
-  dashboardHeader(title = "Basic dashboard"),
+  dashboardHeader(title = "CHOCOLATE"),
   
   dashboardSidebar(
     sidebarMenu(
-      menuItem("Dashboard", tabName = "dashboard", icon = icon("dashboard")),
-      menuItem("Dataset", tabName = "dataset", icon = icon("database")),
-      menuItem("Group members", tabName = "group", icon = icon("people-group")),
-      menuItem("Animated", tabName = "widgets", icon = icon("chart-area")),
-      menuItem("Bar charts", tabName = "barchart", icon = icon("chart-bar")),
-      menuItem("Maps", tabName = "maps", icon = icon("earth-americas")),
-      menuItem("Best chocolate bars", tabName = "bestChocolateBars", icon = icon("percent"))
+      menuItem("Information", tabName = "information", icon = icon("info")),
+      menuItem("Percentage vs Rating", tabName = "percentageVsRating", icon = icon("dashboard")),
+      menuItem("Best per year", tabName = "bestPerYear", icon = icon("chart-area")),
+      menuItem("Best per Bean origin", tabName = "bestPerBeanOrigin", icon = icon("chart-bar")),
+      menuItem("Best per percentage", tabName = "bestPerPercentage", icon = icon("percent")),
+      menuItem("Around the world", tabName = "maps", icon = icon("earth-americas")),
+      menuItem("Group members", tabName = "group", icon = icon("people-group"))
+      
     )
   ),
   
   dashboardBody(
     tabItems(
-      #first tab content
-      tabItem(tabName = "bestChocolateBars",
+      tabItem(tabName="information",
               fluidRow( 
-                box(
-                  title = "Choose the range of cocoa percentage that you prefer",width=3,
-                  selectInput("from", 
-                              label = "from",
-                              choices = c("40", "50","60", "70", "80", "90", "100"),
-                              selected = "40"),
-                  selectInput("to", 
-                              label = "to",
-                              choices = c("40", "50","60", "70", "80", "90", "100"),
-                              selected = "60"),
-                ),
-                box(title = "Best chocolate bars in the selected range", width=12, status="primary",plotOutput(outputId = "plot4", width="100%"))
-              )),
-      tabItem(tabName = "dashboard",
-              # Boxes need to be put in a row (or column)
-              fluidRow( 
-                box(
-                  title = "Controls",width=3,
-                  sliderInput(inputId = "percentage",
-                              label = "cocoa percentage:",
-                              min = min(Chocolate$cocoa_percent),
-                              max = max(Chocolate$cocoa_percent),
-                              value =  c(50, 60)),
-           
-                ),
-                 box(title = "Barplot", width=12, status="primary",plotOutput(outputId = "plot1", width="100%"))
-            ),
-             fluidRow(
-                box(width=12,
-                  ggvisOutput("plot2")
-                )
-
-             )
-      ),
-      tabItem(tabName ="barchart",
-              fluidRow(
-                box(
-                  title=strong("Which bean origin has the highest average rating?"), 
-                  width=12, status="primary", 
-                  p("In the following diagram, you can see the average ratings for the different bean origin countries.
-                     Only the top 10 countries are shown, and all of them has an average rating above 3. 
-                    Tobago has the highest average rating with 3.62, then it follows China and Sao Tome & Principe with 3.5."),
-                  plotOutput(outputId = "plot3")
-                )
-              )
-        
-      ),
-      #second tab content
-      tabItem(tabName="maps",
-                  fluidRow(
-                      box(title = "Cocoa percentage per country", width=12, status="primary",plotOutput(outputId = "mapPlot2", width="100%"))
-                    ),
-                    fluidRow(
-                      box(title = "Ratings per country", width=12, status="primary",plotOutput(outputId = "mapPlot3", width="100%"))
-                      ),
-              fluidRow(
-                box(title = "Average number of ingredients used by country", width=12, status="primary",plotOutput(outputId = "mapPlot1", width="100%"))
-              )
-              ),
-      
-      tabItem(tabName="widgets",
-              h2("widgets tab"),
-              fluidRow(
-                selectInput("CircleGraph", "Choose what you want to visualize:",
-                            choices=  list("manufacturers"=1, "bean origins"=2),
-                            selected=1
-                ),
-                hpackedbubbleOutput("bubbleplot", width = "100%", height = "800px")
-              )),
-      tabItem(tabName="group",
-              fluidRow(
-                h2("Group 9"),
-                p("Gábor Gulácsi - gagul21@student.sdu.dk"),
-                p("Jokin Lasa Escobales - jolas21@student.sdu.dk"),
-                p("Zsófia Bardócz - zsbar21@student.sdu.dk"),
-              )
-      ),
-      tabItem(tabName="dataset",
-              fluidRow( 
+                h2("Report"),
+                p("Clicking here you can access the report."),
+                p("You have to be logged in with your Google account to access it."),
+                actionButton(inputId='ab2', label="Report", icon=icon("link"),
+                             onclick ="window.open('https://drive.google.com/file/d/1wnrqjpHOExLj27HVdlXb4cWrkHc-Q4PP/view?usp=share_link', '_blank')"),
                 h2("Data"),
                 p("We found our dataset on Kaggle, which is a really popular platform for data
                   scientists and people who are interested in machine learning. It is a great source
@@ -133,7 +72,80 @@ ui <- dashboardPage(
                 p("In the following table you can see all the entries."),
                 fluidRow(column(DT::dataTableOutput("RawData"),
                                 width = 12))
-              ))
+              )
+      ),
+      tabItem(tabName = "percentageVsRating",
+              fluidRow( 
+                box(
+                  title = "Select the percentage range",width=3,
+                  sliderInput(inputId = "percentage",
+                              label = "cocoa percentage:",
+                              min = min(Chocolate$cocoa_percent),
+                              max = max(Chocolate$cocoa_percent),
+                              value =  c(50, 60)),
+                  
+                ),
+                box(title = "Is there a correlation between a chocolate bar's rating and cocoa percentage?", width=12, status="primary",plotOutput(outputId = "histogramOfRating", width="100%"))
+              ),
+              fluidRow(
+                box(width=12,
+                    ggvisOutput("plot2")
+                )
+              )
+      ),
+      tabItem(tabName="bestPerYear",
+              fluidRow(
+                
+                box(
+                  title=strong("top 10 chocolate bars by manufacturers over the year", 
+                               plotOutput(outputId="animation"), width="100%"),
+                )
+              )
+      ),
+      tabItem(tabName ="bestPerBeanOrigin",
+              fluidRow(
+                box(
+                  title=strong("Which bean origin has the highest average rating?"), 
+                  width=12, status="primary",
+                  plotOutput(outputId = "bestPerBeanOrigin")
+                )
+              )
+      ),
+      tabItem(tabName = "bestPerPercentage",
+              fluidRow( 
+                box(
+                  title = "Choose the range of cocoa percentage that you prefer",width=3,
+                  selectInput("from", 
+                              label = "from",
+                              choices = c("40", "50","60", "70", "80", "90", "100"),
+                              selected = "40"),
+                  selectInput("to", 
+                              label = "to",
+                              choices = c("40", "50","60", "70", "80", "90", "100"),
+                              selected = "60"),
+                ),
+                box(title = "Best chocolate bars in the selected range", width=12, status="primary",plotOutput(outputId = "bestPerPercentage", width="100%"))
+              )
+      ),
+      tabItem(tabName="maps",
+                  fluidRow(
+                      box(title = "Cocoa percentage per country", width=12, status="primary",plotOutput(outputId = "mapPlot2", width="100%"))
+                    ),
+                    fluidRow(
+                      box(title = "Ratings per country", width=12, status="primary",plotOutput(outputId = "mapPlot3", width="100%"))
+                      ),
+              fluidRow(
+                box(title = "Average number of ingredients used by country", width=12, status="primary",plotOutput(outputId = "mapPlot1", width="100%"))
+              )
+      ),
+      tabItem(tabName="group",
+              fluidRow(
+                h2("Group 9"),
+                p("Gábor Gulácsi - gagul21@student.sdu.dk"),
+                p("Jokin Lasa Escobales - jolas21@student.sdu.dk"),
+                p("Zsófia Bardócz - zsbar21@student.sdu.dk"),
+              )
+      )
     )
   )
 )

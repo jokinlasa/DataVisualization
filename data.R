@@ -2,14 +2,20 @@ library(readr)
 library(shiny)
 library(rgdal)
 library(leaflet)
-library(readr)
 library(dplyr)
 library(ggplot2)
 library(shinydashboard)
 library(ggvis)
-library(hpackedbubble)
+library(maps)
 library(reshape2)
+library(hpackedbubble)
 library(DT)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(sf)
+library(ggiraph)
+library(gganimate)
+theme_set(theme_bw())
 
 Chocolate <- read_csv("chocolate_bars_2.csv")
 Chocolate$company_location[Chocolate$company_location == "U.S.A."] <- "United States"
@@ -62,12 +68,6 @@ choco_2017 <- Chocolate[Chocolate$year_reviewed == 2017, ]
 best_choco_2017 <- aggregate(rating ~ manufacturer + company_location, data = choco_2017, FUN = mean)
 best_choco_2017_order <- best_choco_2017[order(-best_choco_2017$rating),]
 
-best_choco_top_20 <- best_choco_2017_order[1:20,]
 
-ggplot(best_choco_top_20, aes(y = reorder(manufacturer, rating),x  = rating, fill = company_location)) +
-  geom_col() +
-  geom_text(aes(label = round(rating,2), hjust = 1.4)) +
-  labs(x = "Rating", y = "Company", title = "Best Chocolate Company in 2017") +
-  theme_minimal()
 
 years <- Chocolate$year_reviewed

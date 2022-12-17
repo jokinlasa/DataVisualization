@@ -6,9 +6,6 @@ library(sf)
 library(rnaturalearth)
 library(rnaturalearthdata)
 
-source('data.r')
-
-
 server <- function(input, output) {
   world <- ne_countries(scale = "medium", returnclass = "sf")
   class(world)
@@ -42,42 +39,7 @@ server <- function(input, output) {
   
   data <- reactive({Chocolate %>% filter(between (cocoa_percent,input$percentage[1], input$percentage[2]))})
   
-  bubble_plot <- reactive({
-    if(input$CircleGraph == "manufacturers"){
-      hpackedbubble(company_values$company_location,Chocolate$manufacturer,company_values$count,
-                    title = "CARBON EMISSIONS AROUND THE WORLD (2014)",
-                    pointFormat = "<b>{point.company_location}:</b> {point.manufacturer}",
-                    dataLabelsFilter = 100,
-                    packedbubbleMinSize = "50%",
-                    packedbubbleMaxSize = "150%",
-                    theme = "sunset",
-                    packedbubbleZMin = 0,
-                    packedbubbleZmax = 1000, split = 1,
-                    gravitational = 0.7,
-                    parentNodeLimit = 1,
-                    dragBetweenSeries = 0,
-                    seriesInteraction = 0,
-                    width = "100%")
-    }
-    if(input$CircleGraph == "bean origins"){
-     hpackedbubble(company_values$company_location,Chocolate$manufacturer,company_values$count,
-                    title = "CARBON EMISSIONS AROUND THE WORLD (2014)",
-                    pointFormat = "<b>{point.bean_origin}:</b> {point.manufacturer}",
-                    dataLabelsFilter = 100,
-                    packedbubbleMinSize = "50%",
-                    packedbubbleMaxSize = "150%",
-                    theme = "sunset",
-                    packedbubbleZMin = 0,
-                    packedbubbleZmax = 1000, split = 1,
-                    gravitational = 0.7,
-                    parentNodeLimit = 1,
-                    dragBetweenSeries = 0,
-                    seriesInteraction = 0,
-                    width = "100%")
-    }
-  })
-  
-  output$plot1 <- renderPlot({
+  output$histogramOfRating <- renderPlot({
     ggplot(data(), aes(x=rating)) + geom_histogram()
   })
   
@@ -118,26 +80,12 @@ server <- function(input, output) {
       ggtitle("World map", subtitle = paste0("(", median(Chocolate$rating), " median rating)"))
   })
 
-  output$bubbleplot <- renderHpackedbubble({ hpackedbubble(company_manufacturers_info2$company_location,company_manufacturers_info2$manufacturer, order_company_values$count,
-                                                           title = "TOP 20 COUNTRIES WITH MORE CHOCOLATE MANUFACTURERS",
-                                                           pointFormat = "<b>{point.name}</b> {point.y}",
-                                                           dataLabelsFilter = 1000,
-                                                           packedbubbleMinSize = "20%",
-                                                           packedbubbleMaxSize = "250%",
-                                                           theme = "sunset",
-                                                           packedbubbleZMin = 0,
-                                                           packedbubbleZmax = 1000, split = 1,
-                                                           gravitational = 0.7,
-                                                           parentNodeLimit = 50,
-                                                           dragBetweenSeries = 0,
-                                                           seriesInteraction = 0,
-                                                           width = "200%")}) 
   bean_origin_rating <- Chocolate %>% 
     group_by(bean_origin) %>% 
     summarise(Average_rating = mean(rating))%>%
     top_n(n = 10, wt = Average_rating)
   
-  output$plot3 <- renderPlot({
+  output$bestPerBeanOrigin <- renderPlot({
     ggplot(data = bean_origin_rating, aes(y = reorder(bean_origin, Average_rating), x = Average_rating, fill = bean_origin)) + 
       geom_col(color = "black") + 
       geom_text(aes(label = round(Average_rating, 2)), hjust = 1.4) +
@@ -151,7 +99,7 @@ server <- function(input, output) {
     summarise(rating = rating, bar_name = bar_name, cocoa_percent = cocoa_percent)%>%
     top_n(n = 10, wt = rating)})
   
-  output$plot4 <- renderPlot({
+  output$bestPerPercentage <- renderPlot({
     ggplot(data = subset(head(top5_chocolate(), 5)), aes(x=rating, y=reorder(bar_name,rating) , fill = bar_name)) +
       geom_col(color = "black") +
       geom_text(aes(label = rating), hjust = 1.4) +
@@ -159,5 +107,43 @@ server <- function(input, output) {
       xlab("Rating") +
       ylab("Chocolate bar name") 
   })
-
+  
+  miscompanas_top10 <- Chocolate %>%
+    group_by(year_reviewed) %>%
+    mutate(rank=order(-rating)*1) %>%
+    filter(rank <=10) %>%
+    ungroup()
+  
+  
+  output$animation<- renderImage({
+    
+    outfile <- tempfile(fileext='.gif')
+    
+    myplotanim <- ggplot(miscompanas_top10, aes(rank, group=manufacturer,
+                                                fill=as.factor(manufacturer), color=as.factor(manufacturer)))+
+      geom_tile(aes(y=rating/2,
+                    height=rating,
+                    width=0.9), alpha=0.8, color=NA) +
+      geom_text(aes(y=0, label=paste(manufacturer," ")), vjust=0.2, hjust=1) +
+      coord_flip(clip="off", expand=FALSE) +
+      scale_y_continuous(labels=scales::comma)+
+      scale_x_reverse()+
+      guides(color=FALSE, fill=FALSE)+
+      
+      labs(title='{closest_state}', x="manufacturer", y="rating")+
+      theme(plot.title = element_text(hjust = 0, size = 10),
+            axis.ticks.y = element_blank(),  # These relate to the axes post-flip
+            axis.text.y  = element_blank(),  # These relate to the axes post-flip
+            plot.margin = margin(1,1,1,1, "cm"))+
+      
+      transition_states(year_reviewed, transition_length = 4, state_length = 1)+
+      exit_fly(x_loc = 0, y_loc = 0) +         # chart exit animation params
+      enter_fly(x_loc = 0, y_loc = 0)
+    
+    anim_save("mygif.gif", animate(myplotanim, fps=10, duration=40, width=650, height=500))
+    
+    list(src = "mygif.gif",
+         contentType = 'image/gif'
+    )
+  })
 }

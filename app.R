@@ -1,22 +1,23 @@
+library(readr)
 library(shiny)
 library(rgdal)
 library(leaflet)
-library(readr)
 library(dplyr)
 library(ggplot2)
 library(shinydashboard)
 library(ggvis)
 library(maps)
 library(reshape2)
-install.packages("hpackedbubble", build_vignettes = TRUE)
 library(hpackedbubble)
 library(DT)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(sf)
+library(ggiraph)
+library(gganimate)
+theme_set(theme_bw())
 
-
-source('ui.R', local = TRUE)
-source('server.R')
-source('data.r')
-
+Chocolate <- read_csv("chocolate_bars_2.csv")
 
 shinyApp(
   ui = ui,
