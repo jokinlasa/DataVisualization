@@ -100,7 +100,7 @@ ui <- dashboardPage(
               fluidRow(
                 
                 box(
-                  title=strong("top 10 chocolate bars by manufacturers over the year", 
+                  title=strong("Top 10 chocolate bars over the years", 
                                plotOutput(outputId="animation"), width="100%"),
                 )
               )
