@@ -43,7 +43,7 @@ ui <- dashboardPage(
                 p("Clicking here you can access the report."),
                 p("You have to be logged in with your Google account to access it."),
                 actionButton(inputId='ab2', label="Report", icon=icon("link"),
-                             onclick ="window.open('https://drive.google.com/file/d/1wnrqjpHOExLj27HVdlXb4cWrkHc-Q4PP/view?usp=share_link', '_blank')"),
+                             onclick ="window.open('https://drive.google.com/file/d/1MihhU9NDocB1cfcsLfAfnCnupioAG6Y_/view?usp=sharing', '_blank')"),
                 h2("Data"),
                 p("We found our dataset on Kaggle, which is a really popular platform for data
                   scientists and people who are interested in machine learning. It is a great source

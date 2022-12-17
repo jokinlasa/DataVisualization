@@ -46,6 +46,19 @@ server <- function(input, output) {
     ggplot(data(), aes(x=rating)) + geom_histogram()
   })
   
+  cocoa_tooltip <- function(x) {
+    if (is.null(x)) return(NULL)
+    if (is.null(x$id)) return(NULL)
+    
+    # Pick out the movie with this ID
+    bar<- Chocolate[Chocolate$id_x == x$id_x, ]
+    
+    paste0("<b> Bar name: ", bar$bar_name, "</b><br> manufacturer:",
+           bar$manufacturer, "<br> bean origin: ",
+           bar$bean_origin
+    )
+  }
+  
   vis <- (
     {
       Chocolate %>% ggvis(~cocoa_percent, ~rating, key:=~id_x ) %>%
