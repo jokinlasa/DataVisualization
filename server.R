@@ -6,6 +6,9 @@ library(sf)
 library(rnaturalearth)
 library(rnaturalearthdata)
 
+Chocolate <- read_csv("chocolate_bars_2.csv")
+
+
 server <- function(input, output) {
   world <- ne_countries(scale = "medium", returnclass = "sf")
   class(world)
@@ -124,13 +127,13 @@ server <- function(input, output) {
       geom_tile(aes(y=rating/2,
                     height=rating,
                     width=0.9), alpha=0.8, color=NA) +
-      geom_text(aes(y=0, label=paste(manufacturer," ")), vjust=0.2, hjust=1) +
+      geom_text(aes(y=0, label=paste(bar_name," ")), vjust=0.2, hjust=1) +
       coord_flip(clip="off", expand=FALSE) +
       scale_y_continuous(labels=scales::comma)+
       scale_x_reverse()+
       guides(color=FALSE, fill=FALSE)+
       
-      labs(title='{closest_state}', x="manufacturer", y="rating")+
+      labs(title='{closest_state}', x="chocholate bar name", y="rating")+
       theme(plot.title = element_text(hjust = 0, size = 10),
             axis.ticks.y = element_blank(),  # These relate to the axes post-flip
             axis.text.y  = element_blank(),  # These relate to the axes post-flip

@@ -15,6 +15,9 @@ library(rnaturalearthdata)
 library(sf)
 library(ggiraph)
 library(gganimate)
+
+Chocolate <- read_csv("chocolate_bars_2.csv")
+
  
 ui <- dashboardPage(
   dashboardHeader(title = "CHOCOLATE"),
